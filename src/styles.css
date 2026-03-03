@@ -1,0 +1,178 @@
+@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;700;800&display=swap');
+
+:root {
+    --primary-gold: #d4af37;
+    --secondary-gold: #f9e27d;
+    --deep-emerald: #041a16;
+    --emerald-card: #0a2b25;
+    --text-gold: #e5c100;
+    --text-white: #ffffff;
+    --accent-emerald: #10b981;
+    --glass-border: rgba(212, 175, 55, 0.2);
+    --islamic-pattern: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Cg fill='none' stroke='%23d4af37' stroke-opacity='0.12' stroke-width='1.2'%3E%3Cpath d='M50 0 L60 38 L98 48 L60 58 L50 96 L40 58 L2 48 L40 38 Z'/%3E%3Cpath d='M0 0 L32 32 M100 0 L68 32 M100 100 L68 68 M0 100 L32 68'/%3E%3Cpath d='M0 35 L40 35 M0 62 L40 62 M60 35 L100 35 M60 62 L100 62 M35 0 L35 40 M62 0 L62 40 M35 60 L35 100 M62 60 L62 100'/%3E%3Cpath d='M15 15 L35 35 M85 15 L65 35 M85 85 L65 65 M15 85 L35 65'/%3E%3C/g%3E%3C/svg%3E");
+}
+
+.islamic-arch {
+    border-radius: 5rem 5rem 1.5rem 1.5rem;
+    position: relative;
+    overflow: hidden;
+}
+
+.islamic-star {
+    clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Cairo', sans-serif;
+    background-color: var(--deep-emerald);
+    background-image:
+        var(--islamic-pattern),
+        radial-gradient(circle at 50% 0%, rgba(20, 80, 70, 0.4) 0%, transparent 70%),
+        radial-gradient(circle at 0% 100%, rgba(10, 50, 45, 0.3) 0%, transparent 50%);
+    background-attachment: fixed;
+    color: var(--text-white);
+    min-height: 100vh;
+    direction: rtl;
+    overflow-x: hidden;
+}
+
+/* Luxury Glass Card */
+.glass {
+    background: rgba(10, 43, 37, 0.7);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1.5rem;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.glass:hover {
+    transform: translateY(-5px);
+    border-color: var(--primary-gold);
+    box-shadow: 0 15px 45px 0 rgba(212, 175, 55, 0.15);
+}
+
+/* Premium Buttons */
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary-gold), var(--secondary-gold));
+    color: var(--deep-emerald);
+    font-weight: 700;
+    padding: 0.8rem 2rem;
+    border-radius: 2rem;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: scale(1.05);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.5);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: var(--primary-gold);
+    border: 1px solid var(--primary-gold);
+    padding: 0.7rem 1.8rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: rgba(212, 175, 55, 0.1);
+}
+
+/* Typography Gradient */
+.gold-text {
+    background: linear-gradient(to bottom, var(--secondary-gold), var(--primary-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Progress Circle Container */
+.stat-circle {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 8px solid rgba(212, 175, 55, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, transparent 70%);
+}
+
+.stat-circle::before {
+    content: '';
+    position: absolute;
+    inset: -12px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-gold);
+    opacity: 0.6;
+    animation: pulse-gold 3s infinite;
+}
+
+@keyframes pulse-gold {
+    0% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+
+    50% {
+        transform: scale(1.05);
+        opacity: 0.3;
+    }
+
+    100% {
+        transform: scale(1);
+        opacity: 0.6;
+    }
+}
+
+/* Layout Utilities */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 2rem;
+    padding: 2rem 0;
+}
+
+@media (max-width: 768px) {
+    .container {
+        padding: 0 1rem;
+    }
+
+    .bento-grid {
+        grid-template-columns: 1fr;
+        padding: 1rem 0;
+        gap: 1.5rem;
+    }
+
+    .islamic-arch {
+        border-radius: 3rem 3rem 1.2rem 1.2rem;
+    }
+
+    h2 {
+        font-size: 1.8rem !important;
+    }
+}
+
+/* Responsive Table Wrapper */
+.table-responsive {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    margin-bottom: 1rem;
+}

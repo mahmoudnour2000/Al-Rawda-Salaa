@@ -1,0 +1,21 @@
+:host {
+    display: block;
+    padding: 1rem;
+}
+
+.text-muted {
+    color: #94a3b8;
+}
+
+input:focus,
+select:focus {
+    outline: none;
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px rgba(79, 70, 229, 0.2);
+}
+
+@media (max-width: 768px) {
+    .glass {
+        padding: 1.5rem !important;
+    }
+}
