@@ -11,7 +11,7 @@ import { AuthService } from '../../core/services/auth.service';
   template: `
     <div class="members-container container" style="direction: rtl; padding-top: 2rem; padding-bottom: 2rem;">
       <div class="header-section" style="text-align: center; margin-bottom: 3rem;">
-        <h2 class="gold-text" style="font-size: 2.2rem; margin: 0;">إدارة خدّام الروضة</h2>
+        <h2 class="gold-text" style="font-size: 2.2rem; margin: 0;">إدارة محبين الروضة</h2>
         <p class="subtitle" style="color: rgba(255,255,255,0.5); font-size: 1.1rem; margin-top: 0.5rem;">التحكم في صلاحيات وأدوار أعضاء النظام</p>
       </div>
 
