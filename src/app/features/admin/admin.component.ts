@@ -18,7 +18,7 @@ import { SupabaseService } from '../../core/services/supabase.service';
         <!-- Add New User Card -->
         <div class="glass luxury-card">
           <div class="card-header">
-            <h3 class="gold-text">إضافة خادم جديد</h3>
+            <h3 class="gold-text">إضافة محب جديد</h3>
             <p class="subtitle">قم بإنشاء حساب يدوي لأحد المريدين</p>
           </div>
           <div class="form-body">
@@ -56,7 +56,7 @@ import { SupabaseService } from '../../core/services/supabase.service';
           <div class="list-body">
             <div *ngIf="pendingContributions$ | async as pending" class="luxury-list">
               <div *ngFor="let item of pending" class="list-item pending">
-                <div class="user">{{ item.profiles.full_name || 'خادم' }}</div>
+                <div class="user">{{ item.profiles.full_name || 'محب' }}</div>
                 <div class="amount">{{ item.amount }}</div>
                 <div class="actions">
                   <button (click)="updateStatus(item.id, 'approved')" class="btn-action approve">✔️</button>
@@ -338,7 +338,7 @@ export class AdminComponent implements OnInit {
 
       // Group by user
       const grouped = (data || []).reduce((acc: any, curr: any) => {
-        const name = curr.profiles?.full_name || 'خادم مجهول';
+        const name = curr.profiles?.full_name || 'محب مجهول';
         if (!acc[name]) {
           acc[name] = { name, total_amount: 0, count: 0 };
         }
@@ -378,7 +378,7 @@ export class AdminComponent implements OnInit {
 
       if (error) throw error;
 
-      alert('تم إنشاء حساب الخادم بنجاح!');
+      alert('تم إنشاء حساب المحب بنجاح!');
       this.newUser = { email: '', password: '', fullName: '' };
     } catch (err: any) {
       alert('خطأ في الإنشاء: ' + err.message);

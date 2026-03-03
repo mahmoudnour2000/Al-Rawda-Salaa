@@ -745,17 +745,29 @@ export class DashboardComponent implements OnInit {
         .select('*, badges(*)')
         .order('awarded_at', { ascending: true });
 
-      const newBadges = data || [];
+      const fetchedBadges = data || [];
+
+      // safety deduplication for UI
+      const uniqueBadges: any[] = [];
+      const seen = new Set();
+
+      for (const ub of fetchedBadges) {
+        const badgeName = ub.badges?.name || 'Unknown';
+        if (!seen.has(badgeName)) {
+          seen.add(badgeName);
+          uniqueBadges.push(ub);
+        }
+      }
 
       // Check for newly earned badges (if it's not the initial load)
-      if (this.earnedBadges.length > 0 && newBadges.length > this.earnedBadges.length) {
-        const newlyEarned = newBadges.filter(nb => !this.earnedBadges.some(ob => ob.id === nb.id));
+      if (this.earnedBadges.length > 0 && uniqueBadges.length > this.earnedBadges.length) {
+        const newlyEarned = uniqueBadges.filter(nb => !this.earnedBadges.some(ob => ob.id === nb.id));
         if (newlyEarned.length > 0) {
           this.celebratingBadge = newlyEarned[0];
         }
       }
 
-      this.earnedBadges = newBadges;
+      this.earnedBadges = uniqueBadges;
       this.cdr.detectChanges();
     } catch (e) {
       console.error('Error loading badges:', e);

@@ -34,7 +34,7 @@ import { AuthService } from './core/services/auth.service';
         <div class="user-details">
           <ng-container *ngIf="profile$ | async as profile; else guestInfo">
             <div class="user-name">{{ profile.full_name || user.email?.split('@')?.[0] }}</div>
-            <div class="user-role">{{ profile.role === 'admin' ? 'خادم إداري' : 'خادم نشط' }}</div>
+            <div class="user-role">{{ profile.role === 'admin' ? 'محب إداري' : 'محب نشط' }}</div>
           </ng-container>
           <ng-template #guestInfo>
             <div class="user-name">{{ user.email?.split('@')?.[0] }}</div>

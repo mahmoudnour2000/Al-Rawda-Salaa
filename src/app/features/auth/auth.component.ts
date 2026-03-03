@@ -15,7 +15,7 @@ import { Router } from '@angular/router';
           <h2 class="gold-text logo-title">الروضة الزينبية</h2>
         </div>
         
-        <p class="subtitle">تسجيل دخول الخدام والمريدين</p>
+        <p class="subtitle">تسجيل دخول المحبين والمريدين</p>
         
         <div class="input-group">
           <div class="field">

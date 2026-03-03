@@ -19,7 +19,7 @@ import { AuthService } from '../../core/services/auth.service';
         <table class="luxury-table">
           <thead>
             <tr>
-              <th>الخادم</th>
+              <th>المحب</th>
               <th>مرات المشاركة</th>
               <th>إجمالي المساهمات</th>
               <th>الرتبة الحالية</th>
@@ -29,14 +29,14 @@ import { AuthService } from '../../core/services/auth.service';
           <tbody>
             <tr *ngFor="let user of members$ | async" class="table-row">
               <td class="name-cell">
-                <div style="font-weight: 700; color: var(--text-white);">{{ user.full_name || 'خادم مجهول' }}</div>
+                <div style="font-weight: 700; color: var(--text-white);">{{ user.full_name || 'محب مجهول' }}</div>
                 <div style="font-size: 0.8rem; color: rgba(255,255,255,0.4); font-family: monospace;">{{ user.id }}</div>
               </td>
               <td style="text-align: center;">{{ user.total_contributions || 0 }}</td>
               <td class="amount-cell gold-text">{{ user.total_amount || 0 | number }}</td>
               <td>
                 <span class="role-badge" [class.admin-badge]="user.role === 'admin'">
-                  {{ user.role === 'admin' ? 'إداري (Admin)' : 'خادم (User)' }}
+                  {{ user.role === 'admin' ? 'إداري (Admin)' : 'محب (User)' }}
                 </span>
               </td>
               <td class="actions-cell">
@@ -171,8 +171,8 @@ export class MembersComponent implements OnInit {
   async toggleRole(user: any) {
     const newRole = user.role === 'admin' ? 'user' : 'admin';
     const confirmMsg = user.role === 'admin' ?
-      `هل أنت متأكد من سحب صلاحيات الإدارة من ${user.full_name || 'هذا الخادم'}؟` :
-      `هل أنت متأكد من ترقية ${user.full_name || 'هذا الخادم'} ليكون إدارياً؟`;
+      `هل أنت متأكد من سحب صلاحيات الإدارة من ${user.full_name || 'هذا المحب'}؟` :
+      `هل أنت متأكد من ترقية ${user.full_name || 'هذا المحب'} ليكون إدارياً؟`;
 
     if (!confirm(confirmMsg)) return;
 
@@ -192,7 +192,7 @@ export class MembersComponent implements OnInit {
   }
 
   async confirmDelete(user: any) {
-    const confirmMsg = `⚠️ تحذير نهائي: هل أنت متأكد تماماً من حذف الخادم "${user.full_name || 'مجهول'}"؟
+    const confirmMsg = `⚠️ تحذير نهائي: هل أنت متأكد تماماً من حذف المحب "${user.full_name || 'مجهول'}"؟
 سيتم حذف حسابه نهائياً من النظام ولن يتمكن من الدخول مرة أخرى.`;
 
     if (!confirm(confirmMsg)) return;
@@ -205,7 +205,7 @@ export class MembersComponent implements OnInit {
 
       this.refresh$.next();
       this.cdr.detectChanges();
-      alert('تم حذف الخادم نهائياً من النظام.');
+      alert('تم حذف المحب نهائياً من النظام.');
     } catch (err: any) {
       alert('خطأ في عملية الحذف: ' + err.message);
     }
