@@ -1,4 +1,5 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { from, Observable, of, map, BehaviorSubject, switchMap } from 'rxjs';
@@ -18,8 +19,8 @@ import { SupabaseService } from '../../core/services/supabase.service';
         <!-- Add New User Card -->
         <div class="glass luxury-card">
           <div class="card-header">
-            <h3 class="gold-text">إضافة محب جديد</h3>
-            <p class="subtitle">قم بإنشاء حساب يدوي لأحد المريدين</p>
+            <h3 class="gold-text">إضافة حساب يدوي</h3>
+            <p class="subtitle">إنشاء حساب مفعل مباشرة</p>
           </div>
           <div class="form-body">
              <input [(ngModel)]="newUser.email" placeholder="البريد الإلكتروني" class="luxury-input">
@@ -275,6 +276,7 @@ import { SupabaseService } from '../../core/services/supabase.service';
 export class AdminComponent implements OnInit {
   private programService = inject(ProgramService);
   private supabase = inject(SupabaseService);
+  public router = inject(Router);
   private cdr = inject(ChangeDetectorRef);
 
   newProgram: Partial<Program> = {

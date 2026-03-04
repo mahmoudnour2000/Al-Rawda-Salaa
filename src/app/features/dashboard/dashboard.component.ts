@@ -111,16 +111,37 @@ import { ProgramService } from '../../core/services/program.service';
         </div>
 
         <div class="modal-body">
-          <div class="input-wrapper">
-            <label class="input-label gold-text">عدد الصلوات الكلي</label>
-            <input type="number" [(ngModel)]="amount" placeholder="0" class="counter-input">
-          </div>
+          <ng-container *ngIf="!confirming; else confirmState">
+            <div class="input-wrapper">
+              <label class="input-label gold-text">عدد الصلوات الكلي</label>
+              <input type="number" [(ngModel)]="amount" placeholder="0" class="counter-input">
+            </div>
 
-          <button (click)="submit()" class="btn-primary submit-btn">
-            تأكيد الإضافة المباركة
-          </button>
+            <!-- Cooldown Warning -->
+            <div *ngIf="cooldownDisplay" class="cooldown-warning">
+              ⚠️ يرجى الانتظار: {{ cooldownDisplay }} متبقية
+            </div>
+
+            <button (click)="requestConfirm()" class="btn-primary submit-btn" [disabled]="!!cooldownDisplay">
+              إضافة الورد المبارك
+            </button>
+          </ng-container>
+
+          <ng-template #confirmState>
+            <div class="confirmation-section">
+              <div class="ornament-icon">📿</div>
+              <h4 class="gold-text">هل أنت متأكد من هذا العدد؟</h4>
+              <div class="confirm-amount">{{ amount | number }}</div>
+              <p class="confirm-note">سيتم تسجيل هذا العدد في ميزان حسناتكم بإذن الله.</p>
+              
+              <div class="confirm-actions">
+                <button (click)="submit()" class="btn-primary confirm-btn">نعم، متأكد</button>
+                <button (click)="confirming = false" class="cancel-btn">تعديل العدد</button>
+              </div>
+            </div>
+          </ng-template>
           
-          <button (click)="closeForm()" class="cancel-link">إلغاء الأمر</button>
+          <button *ngIf="!confirming" (click)="closeForm()" class="cancel-link">إلغاء الأمر</button>
         </div>
       </div>
     </div>
@@ -609,6 +630,56 @@ import { ProgramService } from '../../core/services/program.service';
       transition: color 0.3s;
     }
     .cancel-link:hover { color: var(--text-white); }
+    
+    .cooldown-warning {
+      color: #ff5f5f;
+      background: rgba(255, 95, 95, 0.1);
+      padding: 0.8rem;
+      border-radius: 0.8rem;
+      margin-bottom: 1rem;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+
+    .confirmation-section {
+      padding: 1rem 0;
+    }
+    .confirm-amount {
+      font-size: 3rem;
+      font-weight: 900;
+      color: var(--primary-gold);
+      margin: 1rem 0;
+      text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+    }
+    .confirm-note {
+      color: rgba(255,255,255,0.6);
+      font-size: 0.9rem;
+      margin-bottom: 2rem;
+    }
+    .confirm-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .confirm-btn {
+      width: 100%;
+      padding: 1.2rem;
+      border-radius: 3rem;
+    }
+    .cancel-btn {
+      background: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      color: white;
+      padding: 0.8rem;
+      border-radius: 2rem;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .cancel-btn:hover {
+      background: rgba(255,255,255,0.05);
+      border-color: white;
+    }
+
     @keyframes modalFadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes modalSlideUp { from { opacity: 0; transform: translateY(60px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
 
@@ -711,6 +782,9 @@ export class DashboardComponent implements OnInit {
 
   amount = 100;
   showForm = false;
+  confirming = false;
+  cooldownDisplay = '';
+  private cooldownInterval: any;
 
   userStats = {
     current_streak: 0,
@@ -735,8 +809,42 @@ export class DashboardComponent implements OnInit {
     this.selectedProgram$.next(p);
   }
 
-  openForm() { this.showForm = true; this.cdr.detectChanges(); }
-  closeForm() { this.showForm = false; this.cdr.detectChanges(); }
+  openForm() {
+    this.showForm = true;
+    this.confirming = false;
+    this.startCooldownCheck();
+    this.cdr.detectChanges();
+  }
+
+  closeForm() {
+    this.showForm = false;
+    this.confirming = false;
+    if (this.cooldownInterval) clearInterval(this.cooldownInterval);
+    this.cdr.detectChanges();
+  }
+
+  private startCooldownCheck() {
+    if (this.cooldownInterval) clearInterval(this.cooldownInterval);
+
+    this.updateCooldown();
+    this.cooldownInterval = setInterval(() => {
+      this.updateCooldown();
+      if (!this.cooldownDisplay) {
+        clearInterval(this.cooldownInterval);
+      }
+      this.cdr.detectChanges();
+    }, 1000);
+  }
+
+  private updateCooldown() {
+    this.updateCooldownText();
+  }
+
+  requestConfirm() {
+    if (this.amount <= 0) return;
+    this.confirming = true;
+    this.cdr.detectChanges();
+  }
 
   private async loadBadges() {
     try {
@@ -783,20 +891,62 @@ export class DashboardComponent implements OnInit {
     const sp = this.selectedProgram$.value;
     if (this.amount <= 0 || !sp) return;
 
+    // Final check for cooldown before actual submission
+    const isCooldown = this.checkCooldownStatus();
+    if (isCooldown) {
+      this.notify.show('يرجى الانتظار 3 دقائق بين الإضافات', 'error');
+      return;
+    }
+
     try {
       await this.contributionService.addContribution(this.amount, sp.id);
       this.notify.show(`✨ تم بنجاح! إضافة ${this.amount} صلاة للبرنامج.`, 'success');
       this.amount = 100;
       this.showForm = false;
+      this.confirming = false;
 
       // Force refresh data
       await this.auth.refreshProfile();
       await this.programService.fetchActivePrograms();
       this.contributionService.fetchUserContributions();
-      await this.loadBadges(); // Refresh badges after contribution
+      await this.loadBadges();
       this.cdr.detectChanges();
     } catch (err: any) {
       this.notify.show(err.message, 'error');
     }
+  }
+
+  private checkCooldownStatus(): boolean {
+    const contributions = this.contributionService.contributionsValue;
+    if (!contributions || contributions.length === 0) return false;
+
+    const last = new Date(contributions[0].created_at!);
+    const now = new Date();
+    const diff = (now.getTime() - last.getTime()) / 1000;
+    return diff < 180; // 3 minutes
+  }
+
+  private updateCooldownText() {
+    const contributions = this.contributionService.contributionsValue;
+    if (!contributions || contributions.length === 0) {
+      this.cooldownDisplay = '';
+      return;
+    }
+
+    const last = new Date(contributions[0].created_at!);
+    const now = new Date();
+    const diff = 180 - (now.getTime() - last.getTime()) / 1000;
+
+    if (diff > 0) {
+      const mins = Math.floor(diff / 60);
+      const secs = Math.floor(diff % 60);
+      this.cooldownDisplay = `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+    } else {
+      this.cooldownDisplay = '';
+    }
+  }
+
+  ngOnDestroy() {
+    if (this.cooldownInterval) clearInterval(this.cooldownInterval);
   }
 }

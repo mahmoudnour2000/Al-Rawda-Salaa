@@ -10,6 +10,7 @@ export interface Contribution {
     amount: number;
     contribution_date: string;
     status: 'approved' | 'pending' | 'rejected';
+    created_at?: string;
 }
 
 @Injectable({
@@ -21,6 +22,10 @@ export class ContributionService {
 
     get contributions$(): Observable<Contribution[]> {
         return this._contributions.asObservable();
+    }
+
+    get contributionsValue(): Contribution[] {
+        return this._contributions.value;
     }
 
     constructor() {
@@ -70,7 +75,7 @@ export class ContributionService {
             .from('contributions')
             .select('*, programs(title)')
             .eq('user_id', user.id)
-            .order('contribution_date', { ascending: false });
+            .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error fetching user contributions:', error);
@@ -84,7 +89,7 @@ export class ContributionService {
             .from('contributions')
             .select('*, programs(title)')
             .eq('user_id', userId)
-            .order('contribution_date', { ascending: false });
+            .order('created_at', { ascending: false });
 
         if (error) {
             console.error('Error getting user contributions:', error);

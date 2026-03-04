@@ -1,6 +1,6 @@
 import { Component, inject, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { from, Observable, of, map, BehaviorSubject, switchMap, tap } from 'rxjs';
+import { from, Observable, of, map, BehaviorSubject, switchMap, shareReplay } from 'rxjs';
 import { SupabaseService } from '../../core/services/supabase.service';
 import { AuthService } from '../../core/services/auth.service';
 
@@ -155,6 +155,7 @@ export class MembersComponent implements OnInit {
     switchMap(() => from(this.supabase.client
       .from('member_management')
       .select('*')
+      .eq('status', 'approved')
       .order('created_at', { ascending: false }))),
     map((res: any) => {
       if (res.error) {
@@ -163,7 +164,7 @@ export class MembersComponent implements OnInit {
       }
       return res.data || [];
     }),
-    tap(() => this.cdr.detectChanges())
+    shareReplay(1)
   );
 
   ngOnInit() { }

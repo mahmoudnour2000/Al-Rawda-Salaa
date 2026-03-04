@@ -13,9 +13,18 @@ export const authGuard: CanActivateFn = () => {
     return auth.currentUser$.pipe(
         filter(user => user !== undefined),
         take(1),
-        map(user => {
-            if (user) return true;
-            return router.createUrlTree(['/auth']);
+        switchMap(user => {
+            if (!user) return of(router.createUrlTree(['/auth']));
+
+            return auth.currentProfile$.pipe(
+                filter(profile => profile !== undefined),
+                take(1),
+                map(profile => {
+                    if (profile && profile.status === 'approved') return true;
+                    // For pending/rejected, go back to auth page which will show the message
+                    return router.createUrlTree(['/auth']);
+                })
+            );
         })
     );
 };
@@ -30,9 +39,20 @@ export const guestGuard: CanActivateFn = () => {
     return auth.currentUser$.pipe(
         filter(user => user !== undefined),
         take(1),
-        map(user => {
-            if (!user) return true;
-            return router.createUrlTree(['/dashboard']);
+        switchMap(user => {
+            if (!user) return of(true);
+
+            // If user is logged in, only redirect to dashboard if they are APPROVED
+            return auth.currentProfile$.pipe(
+                filter(profile => profile !== undefined),
+                take(1),
+                map(profile => {
+                    if (profile && profile.status === 'approved') {
+                        return router.createUrlTree(['/dashboard']);
+                    }
+                    return true; // Allow them to stay on /auth to see the pending message
+                })
+            );
         })
     );
 };

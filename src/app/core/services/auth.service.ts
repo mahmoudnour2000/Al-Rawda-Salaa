@@ -66,11 +66,23 @@ export class AuthService {
         if (password) {
             return await this.supabase.client.auth.signInWithPassword({ email, password });
         }
-        return await this.supabase.auth.signInWithOtp({ email });
+        return await this.supabase.client.auth.signInWithOtp({ email });
+    }
+
+    async signUp(email: string, password: string, fullName: string) {
+        return await this.supabase.client.auth.signUp({
+            email,
+            password,
+            options: {
+                data: {
+                    full_name: fullName
+                }
+            }
+        });
     }
 
     async signOut() {
-        return await this.supabase.auth.signOut();
+        return await this.supabase.client.auth.signOut();
     }
 
     async getProfile() {
