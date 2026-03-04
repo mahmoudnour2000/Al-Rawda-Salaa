@@ -16,33 +16,21 @@ import { ProgramService } from '../../core/services/program.service';
   imports: [CommonModule, AsyncPipe, FormsModule, HeatmapComponent, BadgeComponent],
   template: `
   <div class="dashboard-container container" style="direction: rtl; padding-top: 1rem; padding-bottom: 2rem;">
-    <!-- Top Profile Section -->
-    <div class="profile-header islamic-arch">
-      <div class="profile-grid">
-        <!-- Left: Larger 3D Spiritual Image -->
-        <div class="image-column">
-          <div class="spiritual-frame-container">
-            <div class="islamic-gold-frame 3d-effect">
-              <img src="/assets/images/spiritual_leader.jpg" alt="Spiritual Leader" class="spiritual-img">
-            </div>
-          </div>
-        </div>
+    <!-- Main Banner Image -->
+    <div class="main-banner-container">
+      <img src="assets/images/dashboard-banner.png" alt="الروضة الزينبية" class="dashboard-banner">
+    </div>
 
-        <!-- Right: Welcoming Content -->
-        <div class="content-column">
-          <div class="welcome-text">
-            <ng-container *ngIf="profile$ | async as profile; else guestWelcome">
-              <h2 class="title-with-glow">مرحباً <span class="gold-gradient-text">سيدي {{ profile.full_name || (user$ | async)?.email?.split('@')?.[0] }}</span></h2>
-            </ng-container>
-            <ng-template #guestWelcome>
-              <h2 class="title-with-glow">مرحباً <span class="gold-gradient-text">سيدي {{ (user$ | async)?.email?.split('@')?.[0] || 'طه' }}</span></h2>
-            </ng-template>
-            <div class="spiritual-motto">
-              <span class="motto-icon">✨</span>
-              <p>تقبّل الله منك صالح الأعمال وبارك في همتك</p>
-              <span class="motto-icon">✨</span>
-            </div>
-          </div>
+    <div class="profile-header islamic-arch overlap-banner">
+      <div class="welcome-text-centered">
+        <ng-container *ngIf="profile$ | async as profile; else guestWelcome">
+          <h2 class="title-with-glow">مرحباً <span class="gold-gradient-text">سيدي {{ profile.full_name || (user$ | async)?.email?.split('@')?.[0] }}</span></h2>
+        </ng-container>
+        <ng-template #guestWelcome>
+          <h2 class="title-with-glow">مرحباً <span class="gold-gradient-text">سيدي {{ (user$ | async)?.email?.split('@')?.[0] || 'طه' }}</span></h2>
+        </ng-template>
+        <div class="spiritual-motto-compact">
+          <p>تقبّل الله منك صالح الأعمال وبارك في همتك</p>
         </div>
       </div>
     </div>
@@ -183,6 +171,12 @@ import { ProgramService } from '../../core/services/program.service';
   </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      width: 100%;
+      overflow-x: hidden; /* Prevent horizontal scroll vibration */
+      position: relative;
+    }
     .bottom-grid {
       display: grid;
       grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
@@ -245,86 +239,78 @@ import { ProgramService } from '../../core/services/program.service';
         height: 140px;
       }
       .title-with-glow {
-        font-size: 1.8rem;
+        font-size: 1rem; /* Even smaller on mobile */
       }
-      .spiritual-motto {
-        font-size: 0.95rem;
-        gap: 0.4rem;
+      .profile-header.overlap-banner {
+        margin-top: -1.2rem !important; /* Slightly more overlap for tighter gap (was -0.8rem) */
+        padding: 0.8rem !important;
+        width: 85% !important; /* Narrower than banner even on mobile */
       }
-      .profile-header {
-        padding: 1.2rem 1rem !important;
-        margin-bottom: 1.5rem !important;
+      .spiritual-motto-compact p {
+        font-size: 0.8rem;
       }
+    }
+    .main-banner-container {
+      width: 100%;
+      text-align: center;
+      margin-bottom: 0rem; /* Tighter spacing */
+      margin-top: -1.5rem; /* Move up slightly more */
+      display: flex;
+      justify-content: center;
+      position: relative;
+      z-index: 30; /* Higher than profile header */
+    }
+    .dashboard-banner {
+      width: 100%;
+      max-width: 100%;
+      max-height: 280px; /* Increased from 220px */
+      height: auto;
+      object-fit: contain;
+      filter: drop-shadow(0 0 25px rgba(212, 175, 55, 0.4));
+      border-radius: 1rem;
     }
     .dashboard-container {
       margin-top: 1rem;
       text-align: center;
     }
-    .profile-header {
-      background: rgba(10, 43, 37, 0.6);
-      padding: 3rem 2rem;
-      border: 1px solid var(--glass-border);
-      margin-bottom: 3rem;
-    }
-    .profile-grid {
-      display: grid;
-      grid-template-columns: 280px 1fr;
-      align-items: center;
-      gap: 3rem;
-      direction: ltr;
-    }
-    .image-column {
-      display: flex;
-      justify-content: center;
-      perspective: 1200px;
-    }
-    .content-column {
-      text-align: right;
-      direction: rtl;
-    }
-    .spiritual-frame-container {
+    .profile-header.overlap-banner {
+      background: rgba(10, 43, 37, 0.7); /* Slightly more transparent */
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      padding: 1rem 1.5rem;
+      border: 1px solid rgba(212, 175, 55, 0.3); /* Thin gold border */
+      outline: 1px solid rgba(255, 255, 255, 0.1); /* Inner glass highlight */
+      outline-offset: -1px;
+      margin-bottom: 2rem;
+      margin-top: -2.2rem; /* Reduced overlap for more gap (was -3.5rem) */
       position: relative;
-      width: 240px;
-      height: 240px;
-      filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.4));
-      animation: spiritualFloat 6s ease-in-out infinite;
-      transform-style: preserve-3d;
+      z-index: 10;
+      border-radius: 1.5rem;
+      box-shadow: 
+        0 20px 40px rgba(0,0,0,0.6),
+        0 0 20px rgba(212, 175, 55, 0.1); /* Subtle gold base glow */
+      width: 70%;
+      max-width: 600px;
+      margin-left: auto;
+      margin-right: auto;
+      transition: all 0.4s ease;
     }
-    .islamic-gold-frame {
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(135deg, var(--primary-gold) 0%, var(--secondary-gold) 50%, var(--primary-gold) 100%);
-      padding: 10px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      position: relative;
-      animation: spiritualGlow 4s ease-in-out infinite;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 0 25px rgba(212, 175, 55, 0.6);
-      transform: rotateY(-20deg) rotateX(10deg);
-      transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    .profile-header.overlap-banner:hover {
+      background: rgba(10, 43, 37, 0.8);
+      box-shadow: 0 25px 50px rgba(0,0,0,0.7), 0 0 30px rgba(212, 175, 55, 0.2);
     }
-    .islamic-gold-frame::before {
-      content: '';
-      position: absolute;
-      inset: -15px;
-      border: 2px solid var(--primary-gold);
-      border-radius: 50%;
-      opacity: 0.3;
-      animation: rotate 20s linear infinite;
+    .welcome-text-centered h2 {
+      font-size: 1.6rem; /* Reduced from default */
+      margin-bottom: 0.3rem;
     }
-    .islamic-gold-frame:hover {
-      transform: rotateY(0deg) rotateX(0deg) scale(1.08);
-      box-shadow: 0 30px 60px rgba(212, 175, 55, 0.4);
+    .spiritual-motto-compact p { 
+      margin: 0; 
+      font-size: 0.95rem; /* Reduced from 1.1rem */
+      opacity: 0.8;
     }
-    .spiritual-img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      border-radius: 50%;
-      border: 5px solid rgba(255, 255, 255, 0.3);
-      box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.5);
+    .welcome-text-centered h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.3rem;
     }
     .title-with-glow {
       font-size: 2.8rem;
@@ -333,9 +319,22 @@ import { ProgramService } from '../../core/services/program.service';
       text-shadow: 0 0 20px rgba(212, 175, 55, 0.3);
     }
     .gold-gradient-text {
-      background: linear-gradient(135deg, var(--secondary-gold), var(--primary-gold));
+      background: linear-gradient(
+        90deg, 
+        #d4af37 0%, 
+        #f1c40f 25%, 
+        #fff1b8 50%, 
+        #f1c40f 75%, 
+        #d4af37 100%
+      );
+      background-size: 200% auto;
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
+      animation: shine 4s linear infinite;
+      display: inline-block;
+    }
+    @keyframes shine {
+      to { background-position: 200% center; }
     }
     .spiritual-motto {
       display: flex;
@@ -379,9 +378,11 @@ import { ProgramService } from '../../core/services/program.service';
       flex-direction: column;
       justify-content: center;
       align-items: center;
-      transform: perspective(1000px) rotateX(8deg);
+      transform: perspective(1000px) rotateX(5deg);
       animation: float 6s ease-in-out infinite;
-      transition: all 0.5s ease;
+      transition: transform 0.5s ease;
+      will-change: transform; /* Hint to browser for optimization */
+      backface-visibility: hidden;
       z-index: 5;
     }
     @media (max-width: 480px) {
@@ -422,6 +423,9 @@ import { ProgramService } from '../../core/services/program.service';
       transform: perspective(1000px) rotateX(0deg) scale(1.05);
       border-color: var(--primary-gold);
       box-shadow: 0 35px 60px -12px rgba(0, 0, 0, 0.6), 0 0 30px rgba(212, 175, 55, 0.2);
+    }
+    .main-circle::after, .inner-ornament {
+      will-change: transform;
     }
     .current-count {
       font-size: 3.5rem;

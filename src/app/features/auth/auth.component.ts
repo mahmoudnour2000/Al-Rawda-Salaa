@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../core/services/auth.service';
@@ -12,6 +12,10 @@ import { take, filter } from 'rxjs';
   template: `
     <div class="auth-container">
       <div class="glass auth-card">
+        <div class="logo-circle">
+          <img src="assets/images/logo-gold.png" alt="الروضة الزينبية" class="auth-logo">
+        </div>
+
         <div class="logo-container">
           <h2 class="gold-text logo-title">الروضة الزينبية</h2>
         </div>
@@ -55,43 +59,109 @@ import { take, filter } from 'rxjs';
     </div>
   `,
   styles: [`
+    :host {
+      display: block;
+      width: 100%;
+      background: transparent;
+    }
+    @media (min-width: 992px) {
+      :host {
+        height: 100vh;
+        overflow: hidden;
+      }
+    }
     .auth-container {
       display: flex;
       justify-content: center;
       align-items: center;
       min-height: 100vh;
       position: relative;
-      overflow: hidden;
       padding: 1rem;
+      box-sizing: border-box;
+    }
+    @media (min-width: 992px) {
+      .auth-container {
+        position: fixed;
+        inset: 0;
+        overflow: hidden;
+      }
     }
     .auth-card {
-      padding: 3.5rem 2.5rem;
+      padding: 3.5rem 1.8rem 1.8rem;
       width: 100%;
-      max-width: 450px;
+      max-width: 380px;
       text-align: center;
       position: relative;
       z-index: 10;
+      margin-top: 50px; /* Offset for half-outside logo */
+    }
+    .logo-circle {
+      position: absolute;
+      top: 0;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 120px;
+      height: 120px;
+      background: linear-gradient(135deg, #a67c00 0%, #d4af37 25%, #fff9e3 50%, #d4af37 75%, #8a6d3b 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 15;
+      animation: float 6s ease-in-out infinite;
+      box-shadow: 
+        0 20px 40px rgba(0, 0, 0, 0.6),
+        0 0 0 1px rgba(255, 255, 255, 0.4),
+        0 0 50px rgba(212, 175, 55, 0.3);
+      padding: 4px;
+    }
+    .logo-circle::before {
+      content: '';
+      position: absolute;
+      inset: -10px;
+      border: 1px solid rgba(212, 175, 55, 0.2);
+      border-radius: 50%;
+      animation: rotate 15s linear infinite;
+    }
+    .logo-circle::after {
+      content: '';
+      position: absolute;
+      inset: -15px;
+      border: 1px dashed rgba(212, 175, 55, 0.1);
+      border-radius: 50%;
+      animation: rotate 25s linear reverse infinite;
+    }
+    .auth-logo {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 50%;
+      background: radial-gradient(circle at center, #0a2b25 0%, #02110e 100%);
+      border: 2px solid #8a6d3b;
+      box-shadow: inset 0 0 25px rgba(0,0,0,0.8);
+      padding: 8px;
     }
     .logo-container {
-      position: relative;
-      margin-bottom: 1.5rem;
+      margin-top: 0.8rem;
+      margin-bottom: 1.2rem;
     }
     .logo-title {
-      font-size: 2.5rem;
+      font-size: 1.8rem;
       font-weight: 800;
       margin: 0;
       letter-spacing: 1px;
+      text-shadow: 0 0 15px rgba(212, 175, 55, 0.3);
     }
     .subtitle {
       color: rgba(255,255,255,0.6);
-      font-size: 1.1rem;
-      margin-bottom: 3rem;
+      font-size: 0.95rem;
+      margin-bottom: 1.5rem;
     }
     .input-group {
       display: flex;
       flex-direction: column;
-      gap: 1.5rem;
-      margin-bottom: 1.5rem;
+      gap: 1rem;
+      margin-bottom: 1rem;
     }
     .field {
       text-align: right;
@@ -125,12 +195,12 @@ import { take, filter } from 'rxjs';
     }
     .login-btn {
       width: 100%;
-      font-size: 1.2rem;
-      padding: 1rem;
-      margin-bottom: 1.5rem;
+      font-size: 1.1rem;
+      padding: 0.8rem;
+      margin-bottom: 1rem;
     }
     .toggle-mode {
-      margin-bottom: 2rem;
+      margin-bottom: 1rem;
     }
     .gold-link {
       color: var(--primary-gold);
@@ -153,15 +223,23 @@ import { take, filter } from 'rxjs';
     .message.success { color: var(--accent-emerald); background: rgba(16, 185, 129, 0.1); }
     
     .footer-note {
-      font-size: 0.85rem;
+      font-size: 0.8rem;
       color: rgba(255,255,255,0.4);
-      margin-top: 2rem;
+      margin-top: 1rem;
       font-style: italic;
     }
 
+    @keyframes float {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+      50% { transform: translate(-50%, -50%) translateY(-10px); }
+    }
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
   `]
 })
-export class AuthComponent implements OnInit {
+export class AuthComponent implements OnInit, OnDestroy {
   private auth = inject(AuthService);
   private router = inject(Router);
 
@@ -174,6 +252,11 @@ export class AuthComponent implements OnInit {
   isError = false;
 
   ngOnInit() {
+    // Disable body scroll on desktop
+    if (window.innerWidth >= 992) {
+      document.body.style.overflow = 'hidden';
+    }
+
     // Check if user is already logged in but pending
     this.auth.currentProfile$.pipe(
       filter(p => p !== undefined),
@@ -268,5 +351,9 @@ export class AuthComponent implements OnInit {
     } finally {
       this.loading = false;
     }
+  }
+
+  ngOnDestroy() {
+    document.body.style.overflow = 'auto';
   }
 }
